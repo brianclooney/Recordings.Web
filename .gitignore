@@ -1,0 +1,8 @@
+
+.env
+
+API/bin/
+API/obj/
+
+docs/build/
+

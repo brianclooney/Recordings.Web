@@ -1,0 +1,255 @@
+= Recording Management API Reference
+:toc: left
+:toclevels: 4
+:icons: font
+:revdate: {localdate}
+:revnumber: v1.0.0
+
+== Introduction
+
+This document outlines the API specification for the Recording Management System, which allows users to upload, manage, and access recordings.
+
+== Base URL
+
+The base URL for all API endpoints is: `http://<your_api_domain>/api/recordings`
+
+== Recordings
+
+// ==================== GET AVAILABLE DATES ====================
+
+=== Get Available Dates
+
+.Request
+* **URL**: `/api/recordings/dates`
+* **Method**: `GET`
+
+.Response
+* **Status Codes**:
+  - `200 OK`: Successfully retrieved the list of dates with available recordings.
+* **Body**:
++
+[source,json]
+----
+{
+  "dates": [
+    "2024-03-21",
+    "2024-03-22",
+    "2024-04-05"
+  ]
+}
+----
+
+// ==================== FETCH RECORDINGS ====================
+
+=== Fetch Recordings
+
+.Request
+* **URL**: `/api/recordings`
+* **Method**: `GET`
+* **Query Parameters**:
+  - `date`: Optional filter by specific date.
+  - `title`: Optional search filter by recording title.
+
+.Response
+* **Status Codes**:
+  - `200 OK`: Successfully retrieved the list of recordings, optionally filtered.
+* **Body**:
++
+[source,json]
+----
+[
+  {
+    "id": 1,
+    "date": "2024-03-21",
+    "title": "Morning Practice",
+    "url": "http://example.com/static/recordings/morning_practice.mp3"
+  },
+  {
+    "id": 2,
+    "date": "2024-03-21",
+    "title": "Evening Jam",
+    "url": "http://example.com/static/recordings/evening_jam.mp3"
+  }
+]
+----
+
+// ==================== UPLOAD RECORDINGS ====================
+
+=== Upload Recordings
+
+.Request
+* **URL**: `/api/recordings`
+* **Method**: `POST`
+* **Headers**:
+  - `Content-Type`: multipart/form-data
+* **Form Data**:
+  - `archive`: The archive file containing the recordings and metadata.
+
+.Response
+* **Status Codes**:
+  - `201 Created`: Successfully uploaded and processed the recordings.
+* **Body**:
++
+[source,json]
+----
+{
+  "message": "Upload successful",
+  "processedRecordings": 3
+}
+----
+
+// ==================== FETCH SONG TITLES FOR AUTO-COMPLETE ====================
+
+=== Fetch Song Titles for Auto-complete
+
+.Request
+* **URL**: `/api/recordings/titles`
+* **Method**: `GET`
+* **Query Parameters**:
+  - `query`: Optional search term for filtering song titles.
+
+.Response
+* **Status Codes**:
+  - `200 OK`: Successfully retrieved the list of song titles, optionally filtered.
+* **Body**:
++
+[source,json]
+----
+[
+  "Morning Practice",
+  "Evening Jam",
+  "Special Guest Session"
+]
+----
+
+// ==================== PODCAST RSS FEED ====================
+
+=== Podcast RSS Feed
+
+.Request
+* **URL**: `/api/recordings/rss`
+* **Method**: `GET`
+* **Parameters**: None
+
+.Response
+* **Status Codes**:
+  - `200 OK`: Successfully generated and returned the podcast RSS feed.
+* **Body**:
++
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:podcast="https://podcastindex.org/namespace/1.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+
+<channel>
+    <title>Your Podcast Title</title>
+    <link>http://example.com/podcasts</link>
+    <description>This is a description of your podcast, covering various topics and featuring multiple songs per episode.</description>
+    <language>en-us</language>
+    <itunes:author>Your Name or Organization</itunes:author>
+    <itunes:category text="Music"/>
+    <atom:link href="http://example.com/podcasts/rss.xml" rel="self" type="application/rss+xml" />
+    <image>
+        <url>http://example.com/podcasts/cover.jpg</url>
+        <title>Your Podcast Title</title>
+        <link>http://example.com/podcasts</link>
+    </image>
+
+    <item>
+        <title>Episode on 2024-03-21</title>
+        <description>This episode features a series of songs recorded on March 21, 2024.</description>
+        <pubDate>Thu, 21 Mar 2024 00:00:00 GMT</pubDate>
+        <link>http://example.com/podcasts/2024-03-21</link>
+        <guid isPermaLink="false">uuid:1234-5678-2024-03-21</guid>
+        <itunes:author>Your Name or Organization</itunes:author>
+        <itunes:summary>This episode includes a special selection of songs recorded live on March 21, 2024.</itunes:summary>
+        <enclosure url="http://example.com/static/recordings/2024-03-21.mp3" type="audio/mpeg" length="12345678"/>
+        <podcast:chapters>
+            <podcast:chapter startTime="00:00:00" title="Introduction"/>
+            <podcast:chapter startTime="00:01:45" title="Song 1 Title"/>
+            <podcast:chapter startTime="00:04:30" title="Song 2 Title"/>
+            <!-- More chapter entries as needed -->
+        </podcast:chapters>
+    </item>
+
+    <!-- Additional <item> entries for other episodes -->
+
+</channel>
+</rss>
+----
+
+// ==================== PROMETHEUS METRICS ====================
+
+=== Prometheus Metrics
+
+.Request
+* **URL**: `/metrics`
+* **Method**: `GET`
+* **Parameters**: None
+
+.Response
+* **Status Codes**:
+  - `200 OK`: Successfully retrieved the service metrics.
+* **Body**:
++
+[source,text]
+----
+# HELP http_requests_total The total number of HTTP requests.
+# TYPE http_requests_total counter
+http_requests_total{method="post",code="200"} 1027 1395066363000
+
+# HELP recordings_total The total number of recordings available.
+# TYPE recordings_total gauge
+recordings_total 520
+
+# HELP recordings_accessed_total The total number of recordings that have been accessed at least once.
+# TYPE recordings_accessed_total counter
+recordings_accessed_total 415
+
+# HELP session_dates_total The total number of unique session dates for all recordings.
+# TYPE session_dates_total gauge
+session_dates_total 365
+
+# HELP recordings_per_session_average The average number of recordings accessed per session/date.
+# TYPE recordings_per_session_average gauge
+recordings_per_session_average 5.7
+----
+
+// ==================== SERVE STATIC RECORDINGS ====================
+
+=== Serve Static Recordings
+
+.Request
+* **URL**: `/static/recordings/{filename}`
+* **Method**: `GET`
+* **Description**: Access or download a specific MP3 recording. Replace `{filename}` with the actual name of the MP3 file you wish to access.
+
+.Response
+* **Status Codes**:
+  - `200 OK`: The requested MP3 file is successfully returned.
+  - `404 Not Found`: No recording was found matching the provided filename.
+* **Headers**:
+  - `Content-Type`: audio/mpeg
+* **Body**: 
+  The binary data of the MP3 file.
+
+== Note on Serving Static Files
+
+While this endpoint appears under the API documentation for clarity, the actual serving of static files is typically handled by the web server (e.g., NGINX) and not directly by the ASP.NET Core application in a production environment. This setup leverages the web server's optimized static file serving capabilities for better performance and scalability.
+
+== Configuration Example for NGINX
+
+To serve static MP3 recordings efficiently, configure your NGINX server with a location block similar to the following:
+
+[source,nginx]
+----
+location /static/recordings {
+    alias /path/to/your/mp3/directory; # The directory where MP3 files are stored
+}
+----
+
+Ensure the path is correctly set to where your MP3 files are stored. This configuration directs requests to `/static/recordings/{filename}` to the corresponding file in the specified directory, utilizing NGINX's efficient file serving mechanism.
