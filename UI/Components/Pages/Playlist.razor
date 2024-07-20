@@ -1,0 +1,61 @@
+@rendermode InteractiveServer
+
+@using Recordings.Shared.DTOs
+
+@inject Recordings.UI.Services.ApiService ApiService
+@inject ILogger<Playlist> Logger
+
+<div class="card">
+    <ul class="track-list">
+        @foreach (var track in Tracks)
+        {
+            <li class="xlist-group-item @GetItemClass(track.OrdinalNumber)" @onclick="() => OnSelectTrack(track)">
+                @track.OrdinalNumber. @track.Title @FormatDuration(track.Duration)
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Date { get; set; } = "0000-00-00";
+
+    [Parameter]
+    public EventCallback<RecordingDto> OnTrackSelected { get; set; }
+
+    private int SelectedIndex { get; set; } = -1;
+    private string CurrentDate { get; set; } = String.Empty;
+
+    private List<RecordingDto> Tracks { get; set; } = new List<RecordingDto>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (CurrentDate != Date)
+        {
+            Tracks = await ApiService.GetRecordingsForDate(Date);
+            SelectedIndex = -1;
+            CurrentDate = Date;
+        }
+    }
+
+    private async Task OnSelectTrack(RecordingDto track)
+    {
+        // Logger.LogInformation($"OnSelectTrack: {track.Title}");
+        SelectedIndex = track.OrdinalNumber;
+        await OnTrackSelected.InvokeAsync(track);
+    }
+
+    private string GetItemClass(int index)
+    {
+        // Logger.LogInformation($"GetItemClass: {index} -- {SelectedIndex}");
+        return index == SelectedIndex ? "selected" : String.Empty;
+    }
+
+    private string FormatDuration(int durationInseconds)
+    {
+        var min = durationInseconds / 60;
+        var sec = durationInseconds % 60;
+        return $"{min}:{sec:D2}";
+    }
+}

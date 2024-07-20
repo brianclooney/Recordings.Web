@@ -1,0 +1,16 @@
+
+ul.date-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul.date-list li {
+    padding: 0.5rem;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.selected {
+    background-color: #007bff;
+    color: white;
+}

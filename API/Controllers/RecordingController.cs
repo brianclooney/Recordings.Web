@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Recordings.API.Configuration;
 using Recordings.API.Data;
-using Recordings.API.DTOs;
+using Recordings.Shared.DTOs;
 using Recordings.API.Extensions;
 using Recordings.API.Services;
 
@@ -16,20 +16,26 @@ namespace Recordings.API.Controllers
         private readonly RecordingDbContext _context;
         private readonly IRecordingExtractionService _recordingExtractionService;
         private readonly FilePathOptions _filePathOptions;
+        private readonly ILogger<RecordingController> _logger;
 
         public RecordingController(
             RecordingDbContext context,
             IRecordingExtractionService recordingExtractionService,
-            IOptions<FilePathOptions> filePathOptions)
+            IOptions<FilePathOptions> filePathOptions,
+            ILogger<RecordingController> logger)
         {
             _filePathOptions = filePathOptions.Value;
             _context = context;
             _recordingExtractionService = recordingExtractionService;
+            _logger = logger;
         }
 
         [HttpGet("dates")]
         public async Task<ActionResult<IEnumerable<DateTime>>> GetRecordingDates()
         {
+            // Console.WriteLine("GetRecordingDates");
+            _logger.LogInformation("GetRecordingDates");
+
             var dates = await _context.Recordings
                 .Select(r => r.RecordingDate)
                 .Distinct()
@@ -80,9 +86,12 @@ namespace Recordings.API.Controllers
 
             var recordings = await query.OrderBy(r => r.RecordingDate).ThenBy(r => r.OrdinalNumber).ToListAsync();
 
+            var staticRoot = $"{_filePathOptions.StaticFileRequestPath}";
+            // _logger.LogInformation($"staticRoot = {staticRoot}");
+
             return recordings.Count == 0 ?
                 NotFound() :
-                Ok(recordings.Select(r => r.AsDto(_filePathOptions.StaticFileRequestPath)));
+                Ok(recordings.Select(r => r.AsDto(staticRoot)));
         }
 
         [HttpPost]
@@ -90,6 +99,8 @@ namespace Recordings.API.Controllers
         [RequestSizeLimit(104857600)] // 100 MB
         public async Task<IActionResult> PostRecordings(IFormFile archive)
         {
+            _logger.LogInformation("PostRecordings");
+
             try
             {
                 Manifest manifest = await _recordingExtractionService.ProcessRecordingUpload(archive, _filePathOptions);
@@ -100,6 +111,7 @@ namespace Recordings.API.Controllers
             }
             catch (ArgumentException e)
             {
+                _logger.LogError("PostRecordings: " + e.Message);
                 return BadRequest(new { e.Message });
             }
         }

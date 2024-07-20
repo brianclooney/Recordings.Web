@@ -4,5 +4,11 @@
 API/bin/
 API/obj/
 
+Shared/bin/
+Shared/obj/
+
+UI/bin/
+UI/obj/
+
 docs/build/
 

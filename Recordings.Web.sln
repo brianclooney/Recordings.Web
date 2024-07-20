@@ -5,6 +5,10 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{368315C1-2918-44AF-AA8F-12C36AE4FF1E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{5EC00EDA-C234-48AC-8483-82C7517B9EFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{1D8F32AE-081B-4858-ABBA-8CDBFCE6701A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +23,14 @@ Global
 		{368315C1-2918-44AF-AA8F-12C36AE4FF1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{368315C1-2918-44AF-AA8F-12C36AE4FF1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{368315C1-2918-44AF-AA8F-12C36AE4FF1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EC00EDA-C234-48AC-8483-82C7517B9EFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EC00EDA-C234-48AC-8483-82C7517B9EFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EC00EDA-C234-48AC-8483-82C7517B9EFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EC00EDA-C234-48AC-8483-82C7517B9EFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D8F32AE-081B-4858-ABBA-8CDBFCE6701A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D8F32AE-081B-4858-ABBA-8CDBFCE6701A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D8F32AE-081B-4858-ABBA-8CDBFCE6701A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D8F32AE-081B-4858-ABBA-8CDBFCE6701A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

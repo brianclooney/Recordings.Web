@@ -1,0 +1,44 @@
+@rendermode InteractiveServer
+
+@using Recordings.Shared.DTOs
+
+@inject IJSRuntime JS
+@inject ILogger<AudioPlayer> Logger
+
+<div class="card" style="xwidth: 18rem;">
+    @if (AudioSource != null)
+    {
+        <audio id="audioPlayer" controls>
+            <source src="@AudioSource" type="audio/mpeg" />
+            Your browser does not support the audio element
+        </audio>
+    }
+</div>
+
+<script>
+    function playAudio() {
+        const audioPlayer = document.getElementById('audioPlayer');
+        if (audioPlayer) {
+            audioPlayer.load();
+            audioPlayer.play();
+        }
+    }
+</script>
+
+@code {
+
+    [Parameter]
+    public RecordingDto? Track { get; set; }
+
+    private string? AudioSource { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Track != null)
+        {
+            AudioSource = Track.Url;
+            // Logger.LogInformation(AudioSource);
+            await JS.InvokeVoidAsync("playAudio");
+        }
+    }
+}

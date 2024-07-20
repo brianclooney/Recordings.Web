@@ -1,6 +1,6 @@
 using Recordings.API.Data;
 using Recordings.API.Data.Entities;
-using Recordings.API.DTOs;
+using Recordings.Shared.DTOs;
 
 namespace Recordings.API.Extensions
 {
@@ -13,7 +13,8 @@ namespace Recordings.API.Extensions
                 Title = recording.Title,
                 Date = recording.RecordingDate.ToString("yyyy-MM-dd"),
                 Duration = recording.Duration,
-                Mp3 = Path.Combine(staticRoot, recording.FilePath)
+                Url = Path.Combine(staticRoot, recording.FilePath),
+                OrdinalNumber = recording.OrdinalNumber
             };
         }
 

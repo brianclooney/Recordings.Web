@@ -1,0 +1,55 @@
+@rendermode InteractiveServer
+
+@inject Recordings.UI.Services.ApiService ApiService
+@inject ILogger<DateSelector> Logger
+
+<div class="card" style="xwidth: 18rem;">
+    <div class="card-header">
+        Recording Date
+    </div>
+    @if (AvailableDates == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <ul class="date-list">
+            @foreach (var date in AvailableDates)
+            {
+                <li @onclick="() => OnDateChange(date)" class="@GetItemClass(date)">
+                    @date
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<string> OnDateSelected { get; set; }
+
+    private List<string>? AvailableDates;
+    private string? SelectedDate { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableDates = await ApiService.GetRecordingDatesAsync();
+        // Logger.LogInformation("OnInitializedAsync: " + string.Join(",", AvailableDates));
+    }
+
+    private async Task OnDateChange(string selectedDate)
+    {
+        if (!string.IsNullOrEmpty(selectedDate))
+        {
+            SelectedDate = selectedDate;
+            // Logger.LogInformation($"OnDateChange: {selectedDate}");
+            await OnDateSelected.InvokeAsync(selectedDate);
+        }
+    }
+
+    private string GetItemClass(string date)
+    {
+        return date == SelectedDate ? "selected" : String.Empty;
+    }
+}
