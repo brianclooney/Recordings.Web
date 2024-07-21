@@ -41,14 +41,12 @@
 
     private async Task OnSelectTrack(RecordingDto track)
     {
-        // Logger.LogInformation($"OnSelectTrack: {track.Title}");
         SelectedIndex = track.OrdinalNumber;
         await OnTrackSelected.InvokeAsync(track);
     }
 
     private string GetItemClass(int index)
     {
-        // Logger.LogInformation($"GetItemClass: {index} -- {SelectedIndex}");
         return index == SelectedIndex ? "selected" : String.Empty;
     }
 

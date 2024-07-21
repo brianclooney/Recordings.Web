@@ -35,7 +35,6 @@
     protected override async Task OnInitializedAsync()
     {
         AvailableDates = await ApiService.GetRecordingDatesAsync();
-        // Logger.LogInformation("OnInitializedAsync: " + string.Join(",", AvailableDates));
     }
 
     private async Task OnDateChange(string selectedDate)
@@ -43,7 +42,6 @@
         if (!string.IsNullOrEmpty(selectedDate))
         {
             SelectedDate = selectedDate;
-            // Logger.LogInformation($"OnDateChange: {selectedDate}");
             await OnDateSelected.InvokeAsync(selectedDate);
         }
     }

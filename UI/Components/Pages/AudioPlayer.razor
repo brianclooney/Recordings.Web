@@ -5,14 +5,11 @@
 @inject IJSRuntime JS
 @inject ILogger<AudioPlayer> Logger
 
-<div class="card" style="xwidth: 18rem;">
-    @if (AudioSource != null)
-    {
-        <audio id="audioPlayer" controls>
-            <source src="@AudioSource" type="audio/mpeg" />
-            Your browser does not support the audio element
-        </audio>
-    }
+<div class="card">
+    <audio id="audioPlayer" controls>
+        <source src="@AudioSource" type="audio/mpeg" />
+        Your browser does not support the audio element
+    </audio>
 </div>
 
 <script>
@@ -21,6 +18,13 @@
         if (audioPlayer) {
             audioPlayer.load();
             audioPlayer.play();
+        }
+    }
+    function stopAudio() {
+        const audioPlayer = document.getElementById('audioPlayer');
+        if (audioPlayer) {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
         }
     }
 </script>
@@ -34,11 +38,24 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Track != null)
+        if (Track == null)
+        {
+             AudioSource = null;
+        }
+        else
         {
             AudioSource = Track.Url;
-            // Logger.LogInformation(AudioSource);
-            await JS.InvokeVoidAsync("playAudio");
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (AudioSource == null)
+        {
+            await JS.InvokeVoidAsync("stopAudio");
+        }
+        else{
+            await JS.InvokeVoidAsync("playAudio");
+        }   
     }
 }

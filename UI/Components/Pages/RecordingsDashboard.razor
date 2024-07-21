@@ -30,14 +30,13 @@
 
     private void HandleDateSelected(string date)
     {
-        // Logger.LogInformation("HandleDateChange: " + date);
         SelectedDate = date;
+        SelectedTrack = null;
         StateHasChanged();
     }
 
     private void HandleTrackSelected(RecordingDto track)
     {
-        // Logger.LogInformation($"HandleTrackSelected: {track.Title}");
         SelectedTrack = track;
         StateHasChanged();
     }
