@@ -34,6 +34,11 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (CurrentFilter != null && CurrentFilter.Equals(Filter))
+        {
+            return;
+        }
+
         if (Filter.Type == TrackFilterType.Date && !String.IsNullOrEmpty(Filter.Value))
         {
             Tracks = await ApiService.GetRecordingsByDate(Filter.Value);
