@@ -1,0 +1,40 @@
+@rendermode InteractiveServer
+
+@inject ILogger<Search> Logger
+
+<div class="card">
+    <div class="card-header">
+        Search Titles
+    </div>
+    <input
+        style="margin: 10px; width: 90%"
+        type="text" 
+        placeholder="Search..." 
+        class="form-control" 
+        @bind="SearchText"
+        @oninput="OnInput"
+        @onkeydown="OnKeyDown" />
+</div>
+
+@code {
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    private string SearchText { get; set; } = String.Empty;
+
+    private void OnInput(ChangeEventArgs eventArgs)
+    {
+        SearchText = eventArgs.Value?.ToString() ?? String.Empty;
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key == "Enter" && !String.IsNullOrEmpty(SearchText))
+        {
+            Logger.LogInformation($"OnKeyDown: {SearchText}");
+            await OnSearch.InvokeAsync(SearchText);
+            SearchText = String.Empty;
+        }
+    }
+}

@@ -36,7 +36,7 @@
 
     private string? AudioSource { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         if (Track == null)
         {
@@ -50,12 +50,6 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (AudioSource == null)
-        {
-            await JS.InvokeVoidAsync("stopAudio");
-        }
-        else{
-            await JS.InvokeVoidAsync("playAudio");
-        }   
+        await JS.InvokeVoidAsync(AudioSource == null ? "stopAudio" : "playAudio");
     }
 }

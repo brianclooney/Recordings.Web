@@ -1,6 +1,7 @@
 @rendermode InteractiveServer
 
 @using Recordings.Shared.DTOs
+@using Recordings.UI.Models
 
 @inject Recordings.UI.Services.ApiService ApiService
 @inject ILogger<Playlist> Logger
@@ -19,23 +20,31 @@
 @code {
 
     [Parameter]
-    public string Date { get; set; } = "0000-00-00";
+    public TrackFilter Filter { get; set; } = new TrackFilter();
+
+    // public string Date { get; set; } = "0000-00-00";
 
     [Parameter]
     public EventCallback<RecordingDto> OnTrackSelected { get; set; }
 
     private int SelectedIndex { get; set; } = -1;
-    private string CurrentDate { get; set; } = String.Empty;
+    private TrackFilter? CurrentFilter { get; set; }
 
     private List<RecordingDto> Tracks { get; set; } = new List<RecordingDto>();
 
     protected override async Task OnParametersSetAsync()
     {
-        if (CurrentDate != Date)
+        if (Filter.Type == TrackFilterType.Date && !String.IsNullOrEmpty(Filter.Value))
         {
-            Tracks = await ApiService.GetRecordingsForDate(Date);
+            Tracks = await ApiService.GetRecordingsByDate(Filter.Value);
             SelectedIndex = -1;
-            CurrentDate = Date;
+            CurrentFilter = Filter;
+        }
+        else if (Filter.Type == TrackFilterType.Title && !String.IsNullOrEmpty(Filter.Value))
+        {
+            Tracks = await ApiService.GetRecordingsByTitle(Filter.Value);
+            SelectedIndex = -1;
+            CurrentFilter = Filter;
         }
     }
 

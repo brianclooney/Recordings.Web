@@ -19,15 +19,25 @@ namespace Recordings.UI.Services
             return await _httpClient.GetFromJsonAsync<List<string>>("/api/recording/dates") ?? new List<string>();
         }
 
-        public async Task<List<RecordingDto>> GetRecordingsForDate(string date)
+        public async Task<List<RecordingDto>> GetRecordingsByDate(string date)
+        {
+            return await GetRecordings($"/api/recording?date={date}");
+        }
+
+        public async Task<List<RecordingDto>> GetRecordingsByTitle(string searchString)
+        {
+            return await GetRecordings($"/api/recording?title={searchString}");
+        }
+
+        private async Task<List<RecordingDto>> GetRecordings(string uri)
         {
             try
             {
-                var tracks = await _httpClient.GetFromJsonAsync<List<RecordingDto>>($"/api/recording?date={date}") ?? new List<RecordingDto>();
+                var tracks = await _httpClient.GetFromJsonAsync<List<RecordingDto>>(uri) ?? new List<RecordingDto>();
                 tracks.ForEach(t => t.Url = new Uri(_httpClient.BaseAddress!, t.Url).ToString());
                 return tracks;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new List<RecordingDto>();
             }
