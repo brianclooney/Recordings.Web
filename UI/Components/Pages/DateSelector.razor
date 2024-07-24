@@ -3,6 +3,8 @@
 @using Recordings.UI.Models
 @using Recordings.UI.Services
 
+@implements IDisposable
+
 @inject ApiService ApiService
 @inject RecordingsState RecordingsState
 @inject ILogger<DateSelector> Logger
@@ -37,6 +39,11 @@
     {
         RecordingsState.OnTrackFilterChanged += HandleTrackFilterChanged;
         AvailableDates = await ApiService.GetRecordingDatesAsync();
+    }
+
+    public void Dispose()
+    {
+        RecordingsState.OnTrackFilterChanged -= HandleTrackFilterChanged;
     }
 
     private void HandleTrackFilterChanged(object? sender, EventArgs e)

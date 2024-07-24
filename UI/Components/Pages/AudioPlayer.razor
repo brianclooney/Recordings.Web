@@ -2,6 +2,8 @@
 
 @using Recordings.UI.Models
 
+@implements IDisposable
+
 @inject IJSRuntime JS
 @inject RecordingsState RecordingsState
 @inject ILogger<AudioPlayer> Logger
@@ -38,6 +40,12 @@
     {
         RecordingsState.OnSelectedTrackChanged += HandleSelectedTrackChanged;
         RecordingsState.OnTrackFilterChanged += HandleTrackFilterChanged;
+    }
+
+    public void Dispose()
+    {
+        RecordingsState.OnSelectedTrackChanged -= HandleSelectedTrackChanged;
+        RecordingsState.OnTrackFilterChanged -= HandleTrackFilterChanged;
     }
 
     private void HandleSelectedTrackChanged(object? sender, EventArgs e)
