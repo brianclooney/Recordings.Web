@@ -3,6 +3,13 @@ using Recordings.Shared.DTOs;
 
 namespace Recordings.UI.Models
 {
+    public enum PlaybackState
+    {
+        Playing,
+        Complete,
+        Unknown
+    }
+
     public class RecordingsState
     {
         private TrackFilter _trackFilter = new TrackFilter();
@@ -33,7 +40,22 @@ namespace Recordings.UI.Models
             }
         }
 
+        private PlaybackState _playbackState = PlaybackState.Unknown;
+        public PlaybackState PlaybackState
+        {
+            get => _playbackState;
+            set
+            {
+                if (_playbackState != value)
+                {
+                    _playbackState = value;
+                    OnPlaybackStateHasChange?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
         public event EventHandler? OnTrackFilterChanged;
         public event EventHandler? OnSelectedTrackChanged;
+        public event EventHandler? OnPlaybackStateHasChange;
     }
 }

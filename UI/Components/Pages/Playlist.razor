@@ -11,11 +11,14 @@
 
 <div class="card">
     <ul class="track-list">
+        @{ int index = 0; }
         @foreach (var track in Tracks)
         {
-            <li class="xlist-group-item @GetItemClass(track.OrdinalNumber)" @onclick="() => OnSelectTrack(track)">
+            var localIndex = index;
+            <li class="xlist-group-item @GetItemClass(localIndex)" @onclick="() => OnSelectTrack(localIndex)">
                 @track.OrdinalNumber. @track.Title @FormatDuration(track.Duration)
             </li>
+            index++;
         }
     </ul>
 </div>
@@ -29,11 +32,13 @@
     protected override void OnInitialized()
     {
         RecordingsState.OnTrackFilterChanged += HandleTrackFilterChanged;
+        RecordingsState.OnPlaybackStateHasChange += HandlePlaybackStateHasChanged;
     }
 
     public void Dispose()
     {
         RecordingsState.OnTrackFilterChanged -= HandleTrackFilterChanged;
+        RecordingsState.OnPlaybackStateHasChange -= HandlePlaybackStateHasChanged;
     }
 
     private async void HandleTrackFilterChanged(object? sender, EventArgs e)
@@ -52,10 +57,26 @@
         }
     }
 
-    private void OnSelectTrack(RecordingDto track)
+    private void HandlePlaybackStateHasChanged(object? sender, EventArgs e)
     {
-        SelectedIndex = track.OrdinalNumber;
-        RecordingsState.SelectedTrack = track;
+        Logger.LogInformation($"HandlePlaybackStateHasChanged: {RecordingsState.PlaybackState}");
+        if (RecordingsState.PlaybackState == PlaybackState.Complete)
+        {
+            // Move to next track
+            SelectedIndex += 1;
+            if (SelectedIndex >= Tracks.Count)
+            {
+                SelectedIndex = 0;
+            }
+            RecordingsState.SelectedTrack = Tracks[SelectedIndex];
+            StateHasChanged();
+        }
+    }
+
+    private void OnSelectTrack(int trackIndex)
+    {
+        SelectedIndex = trackIndex;
+        RecordingsState.SelectedTrack = Tracks[trackIndex];
     }
 
     private string GetItemClass(int index)

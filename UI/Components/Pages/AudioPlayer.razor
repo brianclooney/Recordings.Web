@@ -16,6 +16,23 @@
 </div>
 
 <script>
+
+    function initAudio(dotNetObject) {
+        const audioPlayer = document.getElementById('audioPlayer');
+        if (audioPlayer) {
+
+            audioPlayer.addEventListener('ended', () => {
+                console.log('Audio has finished playing');
+                dotNetObject.invokeMethodAsync("NotifyAudioHasEnded");
+            });
+
+            audioPlayer.addEventListener('playing', () => {
+                console.log('Audio is playing');
+                dotNetObject.invokeMethodAsync("NotifyAudioIsPlaying");
+            });
+        }
+    }
+
     function playAudio() {
         const audioPlayer = document.getElementById('audioPlayer');
         if (audioPlayer) {
@@ -23,6 +40,7 @@
             audioPlayer.play();
         }
     }
+
     function stopAudio() {
         const audioPlayer = document.getElementById('audioPlayer');
         if (audioPlayer) {
@@ -30,6 +48,7 @@
             audioPlayer.currentTime = 0;
         }
     }
+
 </script>
 
 @code {
@@ -62,6 +81,22 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender) {
+            await JS.InvokeVoidAsync("initAudio", DotNetObjectReference.Create(this));
+        }
+
         await JS.InvokeVoidAsync(AudioSource == null ? "stopAudio" : "playAudio");
+    }
+
+    [JSInvokable]
+    public void NotifyAudioHasEnded()
+    {
+        RecordingsState.PlaybackState = PlaybackState.Complete;
+    }
+
+    [JSInvokable]
+    public void NotifyAudioIsPlaying()
+    {
+        RecordingsState.PlaybackState = PlaybackState.Playing;
     }
 }
