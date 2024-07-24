@@ -4,6 +4,7 @@
 @using Recordings.UI.Models
 
 @inject Recordings.UI.Services.ApiService ApiService
+@inject RecordingsState RecordingsState
 @inject ILogger<Playlist> Logger
 
 <div class="card">
@@ -19,44 +20,35 @@
 
 @code {
 
-    [Parameter]
-    public TrackFilter Filter { get; set; } = new TrackFilter();
-
-    // public string Date { get; set; } = "0000-00-00";
-
-    [Parameter]
-    public EventCallback<RecordingDto> OnTrackSelected { get; set; }
-
     private int SelectedIndex { get; set; } = -1;
-    private TrackFilter? CurrentFilter { get; set; }
 
     private List<RecordingDto> Tracks { get; set; } = new List<RecordingDto>();
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized()
     {
-        if (CurrentFilter != null && CurrentFilter.Equals(Filter))
-        {
-            return;
-        }
+        RecordingsState.OnTrackFilterChanged += HandleTrackFilterChanged;
+    }
 
-        if (Filter.Type == TrackFilterType.Date && !String.IsNullOrEmpty(Filter.Value))
+    private async void HandleTrackFilterChanged(object? sender, EventArgs e)
+    {
+        if (RecordingsState.Filter.Type == TrackFilterType.Date && !String.IsNullOrEmpty(RecordingsState.Filter.Value))
         {
-            Tracks = await ApiService.GetRecordingsByDate(Filter.Value);
+            Tracks = await ApiService.GetRecordingsByDate(RecordingsState.Filter.Value);
             SelectedIndex = -1;
-            CurrentFilter = Filter;
+            StateHasChanged();
         }
-        else if (Filter.Type == TrackFilterType.Title && !String.IsNullOrEmpty(Filter.Value))
+        else if (RecordingsState.Filter.Type == TrackFilterType.Title && !String.IsNullOrEmpty(RecordingsState.Filter.Value))
         {
-            Tracks = await ApiService.GetRecordingsByTitle(Filter.Value);
+            Tracks = await ApiService.GetRecordingsByTitle(RecordingsState.Filter.Value);
             SelectedIndex = -1;
-            CurrentFilter = Filter;
+            StateHasChanged();
         }
     }
 
-    private async Task OnSelectTrack(RecordingDto track)
+    private void OnSelectTrack(RecordingDto track)
     {
         SelectedIndex = track.OrdinalNumber;
-        await OnTrackSelected.InvokeAsync(track);
+        RecordingsState.SelectedTrack = track;
     }
 
     private string GetItemClass(int index)

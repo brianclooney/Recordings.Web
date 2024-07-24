@@ -1,4 +1,5 @@
 using UI.Components;
+using Recordings.UI.Models;
 using Recordings.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5222")} );
 builder.Services.AddScoped<ApiService>();
+builder.Services.AddScoped<RecordingsState>();
 
 var app = builder.Build();
 

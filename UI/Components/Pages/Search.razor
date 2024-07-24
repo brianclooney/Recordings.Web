@@ -1,6 +1,9 @@
 @rendermode InteractiveServer
 
+@using Recordings.UI.Models
+
 @inject ILogger<Search> Logger
+@inject RecordingsState RecordingsState
 
 <div class="card">
     <div class="card-header">
@@ -18,9 +21,6 @@
 
 @code {
 
-    [Parameter]
-    public EventCallback<string> OnSearch { get; set; }
-
     private string SearchText { get; set; } = String.Empty;
 
     private void OnInput(ChangeEventArgs eventArgs)
@@ -28,12 +28,11 @@
         SearchText = eventArgs.Value?.ToString() ?? String.Empty;
     }
 
-    private async Task OnKeyDown(KeyboardEventArgs eventArgs)
+    private void OnKeyDown(KeyboardEventArgs eventArgs)
     {
         if (eventArgs.Key == "Enter" && !String.IsNullOrEmpty(SearchText))
         {
-            Logger.LogInformation($"OnKeyDown: {SearchText}");
-            await OnSearch.InvokeAsync(SearchText);
+            RecordingsState.Filter = new TrackFilter { Type = TrackFilterType.Title, Value = SearchText };
             SearchText = String.Empty;
         }
     }

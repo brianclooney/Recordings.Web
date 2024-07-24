@@ -1,8 +1,9 @@
 @rendermode InteractiveServer
 
-@using Recordings.Shared.DTOs
+@using Recordings.UI.Models
 
 @inject IJSRuntime JS
+@inject RecordingsState RecordingsState
 @inject ILogger<AudioPlayer> Logger
 
 <div class="card">
@@ -31,21 +32,24 @@
 
 @code {
 
-    [Parameter]
-    public RecordingDto? Track { get; set; }
-
     private string? AudioSource { get; set; }
 
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-        if (Track == null)
-        {
-             AudioSource = null;
-        }
-        else
-        {
-            AudioSource = Track.Url;
-        }
+        RecordingsState.OnSelectedTrackChanged += HandleSelectedTrackChanged;
+        RecordingsState.OnTrackFilterChanged += HandleTrackFilterChanged;
+    }
+
+    private void HandleSelectedTrackChanged(object? sender, EventArgs e)
+    {
+        AudioSource = RecordingsState.SelectedTrack == null ? null :  RecordingsState.SelectedTrack.Url;
+        StateHasChanged();
+    }
+
+    private void HandleTrackFilterChanged(object? sender, EventArgs e)
+    {
+        AudioSource = null;
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
