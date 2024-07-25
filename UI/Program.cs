@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5222")} );
+var baseAddress = builder.Configuration["ApiSettings:BaseAddress"] ?? "localhost";
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress)} );
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<RecordingsState>();
 
