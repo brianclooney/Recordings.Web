@@ -84,7 +84,7 @@ namespace Recordings.API.Controllers
                 query = query.Where(r => r.Title.ToLower().Contains(title.ToLower()));
             }
 
-            var recordings = await query.OrderBy(r => r.RecordingDate).ThenBy(r => r.OrdinalNumber).ToListAsync();
+            var recordings = await query.OrderByDescending(r => r.RecordingDate).ThenBy(r => r.OrdinalNumber).ToListAsync();
 
             var staticRoot = $"{_filePathOptions.StaticFileRequestPath}";
             // _logger.LogInformation($"staticRoot = {staticRoot}");
