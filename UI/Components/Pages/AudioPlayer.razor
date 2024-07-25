@@ -69,7 +69,7 @@
 
     private void HandleSelectedTrackChanged(object? sender, EventArgs e)
     {
-        AudioSource = RecordingsState.SelectedTrack == null ? null :  RecordingsState.SelectedTrack.Url;
+        AudioSource = RecordingsState.SelectedTrack == null ? null : RecordingsState.SelectedTrack.Url;
         StateHasChanged();
     }
 
@@ -81,11 +81,24 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender) {
+        if (firstRender)
+        {
             await JS.InvokeVoidAsync("initAudio", DotNetObjectReference.Create(this));
         }
 
         await JS.InvokeVoidAsync(AudioSource == null ? "stopAudio" : "playAudio");
+    }
+
+    private void PlayPause()
+    {
+    }
+
+    private void Stop()
+    {
+    }
+
+    private void Seek()
+    {
     }
 
     [JSInvokable]

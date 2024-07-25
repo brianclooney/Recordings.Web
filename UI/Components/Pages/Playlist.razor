@@ -15,8 +15,12 @@
         @foreach (var track in Tracks)
         {
             var localIndex = index;
+            var displayIndex = index + 1;
             <li class="xlist-group-item @GetItemClass(localIndex)" @onclick="() => OnSelectTrack(localIndex)">
-                @track.OrdinalNumber. @track.Title @FormatDuration(track.Duration)
+                <span class="track-title">@displayIndex. @track.Title 
+                    <span class="track-date-@RecordingsState.Filter.Type.ToString().ToLower()">(@ConvertToLongDate(track.Date))</span>
+                </span>
+                <span class="track-duration">@FormatDuration(track.Duration)</span>
             </li>
             index++;
         }
@@ -59,7 +63,6 @@
 
     private void HandlePlaybackStateHasChanged(object? sender, EventArgs e)
     {
-        Logger.LogInformation($"HandlePlaybackStateHasChanged: {RecordingsState.PlaybackState}");
         if (RecordingsState.PlaybackState == PlaybackState.Complete)
         {
             // Move to next track
@@ -89,5 +92,11 @@
         var min = durationInseconds / 60;
         var sec = durationInseconds % 60;
         return $"{min}:{sec:D2}";
+    }
+
+    private string ConvertToLongDate(string shortDate)
+    {
+        DateTime date = DateTime.Parse(shortDate);
+        return date.ToString("MMMM d, yyyy");
     }
 }
