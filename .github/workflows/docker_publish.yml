@@ -94,7 +94,7 @@ jobs:
           UI_TAGS: ${{ steps.ui-meta.outputs.tags }}
           UI_DIGEST: ${{ steps.build-and-push-ui.outputs.digest }}
         run: |
-	  echo "Signing API image"
-	  echo "${API_TAGS} | xargs -I {} cosign sign --yes {}@${API_DIGEST}"
-	  echo "Signing UI image"
-	  echo "${UI_TAGS} | xargs -I {} cosign sign --yes {}@${UI_DIGEST}"
+          echo "Signing API image"
+          echo "${API_TAGS} | xargs -I {} cosign sign --yes {}@${API_DIGEST}"
+          echo "Signing UI image"
+          echo "${UI_TAGS} | xargs -I {} cosign sign --yes {}@${UI_DIGEST}"
