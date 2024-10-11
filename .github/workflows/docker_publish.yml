@@ -32,18 +32,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+	  tags: true
 
       - name: Get Version
         id: get_version
         run: |
           echo "GITHUB_REF=$GITHUB_REF"
-          git fetch --tags
+	  git tag --list
+	  git log --oneline -5
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION=${GITHUB_REF#refs/tags/v}
             FULL_VERSION="${VERSION}"
           else
-            if git describe --tags --abbrev=0 >/dev/null 2>&1; then
-              VERSION=$(git describe --tags --abbrev=0)
+            if git describe --tags --abbrev=0 --match "v*.*.*" >/dev/null 2>&1; then
+              VERSION=$(git describe --tags --abbrev=0 --match "v*.*.*")
               VERSION=${VERSION#v}
             else
               VERSION="0.0.0"
@@ -57,7 +61,7 @@ jobs:
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
+        uses: sigstore/cosign-installer@v3.1.1
         with:
           cosign-release: 'v2.1.1'
 
@@ -78,7 +82,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}
           tags: |
-            type:raw,value=$${{  steps.get_version.outputs.FULL_VERSION }}
+            type=raw,value=${{ steps.get_version.outputs.FULL_VERSION }}
             type=raw,value=latest
 
       - name: Build and push API Docker image
@@ -99,7 +103,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.UI_IMAGE_NAME }}
           tags: |
-            type:raw,value=$${{  steps.get_version.outputs.FULL_VERSION }}
+            type=raw,value=${{ steps.get_version.outputs.FULL_VERSION }}
             type=raw,value=latest    
 
       - name: Build and push UI Docker image
@@ -123,6 +127,6 @@ jobs:
           UI_DIGEST: ${{ steps.build-and-push-ui.outputs.digest }}
         run: |
           echo "Signing API image"
-          echo "${API_TAGS} | xargs -I {} cosign sign --yes {}@${API_DIGEST}"
+          echo "${API_TAGS}" | xargs -I {} cosign sign --yes {}@${API_DIGEST}
           echo "Signing UI image"
-          echo "${UI_TAGS} | xargs -I {} cosign sign --yes {}@${UI_DIGEST}"
+          echo "${UI_TAGS}" | xargs -I {} cosign sign --yes {}@${UI_DIGEST}
