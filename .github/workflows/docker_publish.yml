@@ -40,7 +40,7 @@ jobs:
           git fetch --tags
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION=${GITHUB_REF#refs/tags/v}
-	    FULL_VERSION="${VERSION}"
+            FULL_VERSION="${VERSION}"
           else
             if git describe --tags --abbrev=0 >/dev/null 2>&1; then
               VERSION=$(git describe --tags --abbrev=0)
@@ -48,10 +48,10 @@ jobs:
             else
               VERSION="0.0.0"
             fi
-	    BUILD_NUMBER=${GITHUB_RUN_NUMBER}
-	    FULL_VERSION="${VERSION}-build${BUILD_NUMBER}"
+            BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+            FULL_VERSION="${VERSION}-build${BUILD_NUMBER}"
           fi
-	  echo "FULL_VERSION=$FULL_VERSION"
+          echo "FULL_VERSION=$FULL_VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "FULL_VERSION=$FULL_VERSION" >> $GITHUB_OUTPUT
 
