@@ -34,14 +34,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-	  tags: true
+          tags: true
 
       - name: Get Version
         id: get_version
         run: |
           echo "GITHUB_REF=$GITHUB_REF"
-	  git tag --list
-	  git log --oneline -5
+          git tag --list
+          git log --oneline -5
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION=${GITHUB_REF#refs/tags/v}
             FULL_VERSION="${VERSION}"
