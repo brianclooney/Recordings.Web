@@ -5,8 +5,7 @@ using Recordings.UI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 var baseAddress = builder.Configuration["ApiSettings:BaseAddress"] ?? "localhost";
 
