@@ -1,9 +1,16 @@
 using UI.Components;
 using Recordings.UI.Models;
 using Recordings.UI.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add serilog services to the container and read config from appsettings
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+});
+    
 // Add services to the container.
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -15,15 +22,15 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddr
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<RecordingsState>();
 
-builder.Services.AddLogging(options =>
-{
-    options.AddSimpleConsole(c =>
-    {
-        c.TimestampFormat = "[yyyy-MM-ddTHH:mm:ss] ";
-	c.UseUtcTimestamp = false;
-	c.SingleLine = true;
-    });
-});
+// builder.Services.AddLogging(options =>
+// {
+//     options.AddSimpleConsole(c =>
+//     {
+//         c.TimestampFormat = "[yyyy-MM-ddTHH:mm:ss] ";
+// 	c.UseUtcTimestamp = false;
+// 	c.SingleLine = true;
+//     });
+// });
 
 var app = builder.Build();
 
