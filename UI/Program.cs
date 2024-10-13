@@ -10,9 +10,21 @@ builder.Services.AddRazorComponents()
 
 var baseAddress = builder.Configuration["ApiSettings:BaseAddress"] ?? "localhost";
 
+Console.WriteLine($"baseAddress={baseAddress}");
+
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(baseAddress)} );
 builder.Services.AddScoped<ApiService>();
 builder.Services.AddScoped<RecordingsState>();
+
+builder.Services.AddLogging(options =>
+{
+    options.AddSimpleConsole(c =>
+    {
+        c.TimestampFormat = "[yyyy-MM-ddTHH:mm:ss] ";
+	c.UseUtcTimestamp = false;
+	c.SingleLine = true;
+    });
+});
 
 var app = builder.Build();
 
@@ -20,8 +32,7 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    // app.UseHsts();
 }
 
 // app.UseHttpsRedirection();

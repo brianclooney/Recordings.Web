@@ -34,6 +34,17 @@ namespace Recordings.API
 
             services.AddScoped<IRecordingExtractionService, RecordingExtractionService>();
             services.AddHostedService<UptimeMetricHostedService>();
+
+            services.AddLogging(options =>
+            {
+                options.AddSimpleConsole(c =>
+                {
+                    c.TimestampFormat = "[yyyy-MM-ddTHH:mm:ss] ";
+                    c.UseUtcTimestamp = false;
+                    c.SingleLine = true;
+                });
+            });
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<FilePathOptions> filePathOptionsAccessor)
