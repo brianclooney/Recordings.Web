@@ -16,17 +16,38 @@ namespace Recordings.UI.Services
 
         public async Task<List<string>> GetRecordingDatesAsync()
         {
-            return await _httpClient.GetFromJsonAsync<List<string>>("/api/recording/dates") ?? new List<string>();
+	    try {
+                return await _httpClient.GetFromJsonAsync<List<string>>("/api/recording/dates") ?? new List<string>();
+	    }
+	    catch (Exception e)
+	    {
+	        _logger.LogError($"GetRecordingDatesAsync {e.Message}");
+                return new List<string>();
+	    }
         }
 
         public async Task<List<RecordingDto>> GetRecordingsByDate(string date)
         {
-            return await GetRecordings($"/api/recording?date={date}");
+	    try {
+                return await GetRecordings($"/api/recording?date={date}");
+	    }
+	    catch (Exception e)
+	    {
+	        _logger.LogError($"GetRecordingsByDate {e.Message}");
+		return new List<RecordingDto>();
+	    }
         }
 
         public async Task<List<RecordingDto>> GetRecordingsByTitle(string searchString)
         {
-            return await GetRecordings($"/api/recording?title={searchString}");
+	    try {
+                return await GetRecordings($"/api/recording?title={searchString}");
+	    }
+	    catch (Exception e)
+	    {
+	        _logger.LogError($"GetRecordingsByTitle {e.Message}");
+		return new List<RecordingDto>();
+	    }
         }
 
         private async Task<List<RecordingDto>> GetRecordings(string uri)
@@ -37,8 +58,9 @@ namespace Recordings.UI.Services
                 tracks.ForEach(t => t.Url = new Uri(_httpClient.BaseAddress!, t.Url).ToString());
                 return tracks;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+	        _logger.LogError($"GetRecordings {e.Message}");
                 return new List<RecordingDto>();
             }
         }
