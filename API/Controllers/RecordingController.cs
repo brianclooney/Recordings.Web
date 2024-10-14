@@ -42,7 +42,7 @@ namespace Recordings.API.Controllers
                 .OrderByDescending(d => d)
                 .ToListAsync();
 
-            Ok(dates.Select(d => d.ToString("yyyy-MM-dd")));
+            return Ok(dates.Select(d => d.ToString("yyyy-MM-dd")));
         }
 
         [HttpGet("titles")]
