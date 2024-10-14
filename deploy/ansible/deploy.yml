@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  gather_facts: yes
+
+  roles:
+    - docker
+    - traefik-docker
+    - recordings-web-docker

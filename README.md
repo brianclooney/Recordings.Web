@@ -7,3 +7,10 @@ This repository contains the API for managing audio recordings. The API provides
 
 * .NET SDK
 * Docker
+
+## Deploy with Ansible
+
+```
+cd deploy/ansible
+ansible-playbook -i inventory/example.ini deploy.yml
+```

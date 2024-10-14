@@ -1,0 +1,8 @@
+---
+
+- name: Restart Traefik container
+  become: yes
+  community.docker.docker_container:
+    name: "{{ instance_name }}"
+    state: started
+    restart: yes

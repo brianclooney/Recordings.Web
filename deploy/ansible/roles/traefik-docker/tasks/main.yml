@@ -1,0 +1,71 @@
+---
+
+- name: Ensure all required Traefik directories exist
+  become: yes
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "/srv/traefik/data"
+    - "/srv/traefik/etc"
+    - "/srv/traefik/log"
+
+- name: Ensure Traefik configuration file exists
+  become: yes
+  ansible.builtin.template:
+    src: "traefik.yml.j2"
+    dest: "/srv/traefik/etc/traefik.yml"
+    mode: 0644
+  notify: Restart Traefik container
+
+- name: Create required docker network ({{ private_network }})
+  become: yes
+  community.docker.docker_network:
+    name: "{{ private_network }}"
+    state: present
+    driver: bridge
+    internal: true
+
+- name: Run Traefik container
+  become: yes
+  community.docker.docker_container:
+    name: "{{ instance_name }}"
+    image: traefik:v3.1.6
+    state: started
+    pull: yes
+    restart_policy: unless-stopped
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - name: "{{ private_network }}"
+      - name: public-network
+    volumes:
+      - /etc/timezone:/etc/timezone:ro 
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "/srv/traefik/etc/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "/srv/traefik/log:/var/log/traefik"
+    env:
+      TZ: America/New_York
+    # TODO: Set up labels to map http requests on 8080 to /traefik:80
+
+- name: Run Whoami container behind Traefik for testing ({{ deployment_environment }})
+  become: yes
+  community.general.docker_container:
+    name: whoami
+    image: traefik/whoami
+    state: started
+    pull: yes
+    restart_policy: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - name: "{{ private_network }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.whoami.rule: "Host(`whoami.{{ domain }}`)"
+      traefik.http.routers.whoami.priority: "100"
+      traefik.http.services.whoami.loadbalancer.server.port: "80"
+      traefik.http.routers.whoami.entrypoints: "web"
+  when: deployment_environment | default('') == 'dev'

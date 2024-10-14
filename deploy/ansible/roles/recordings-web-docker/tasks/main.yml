@@ -1,0 +1,104 @@
+---
+
+- name: Ensure all required directories exist
+  become: yes
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+  loop:
+    - "/srv/{{ instance_name }}/data/db"
+    - "/srv/{{ instance_name }}/data/upload"
+    - "/srv/{{ instance_name }}/data/dataprotection"
+    - "/srv/{{ instance_name }}/tmp"
+
+- name: Run database container
+  become: yes
+  community.general.docker_container:
+    name: "{{ instance_name }}-db"
+    image: mariadb:11.3.2-jammy
+    state: started
+    pull: yes
+    restart_policy: unless-stopped
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ db_password }}"
+      MYSQL_DATABASE: "{{ db_database }}"
+      MYSQL_USER: "{{ db_username }}"
+      MYSQL_PASSWORD: "{{ db_password }}"
+    networks:
+      - name: "{{ private_network }}"
+    volumes:
+      - "/srv/{{ instance_name }}/data/db:/var/lib/mysql"
+      - "/srv/{{ instance_name }}/tmp:/tmp/{{ instance_name }}"
+    expose:
+      - 3306
+
+- name: Initialize Traefik API labels
+  set_fact:
+    traefik_api_labels: {}
+
+- name: Set Traefik labels
+  set_fact:
+    traefik_api_labels: "{{ traefik_api_labels | combine({ item.key : item.value }) }}"
+  loop:
+    - { 'key': 'traefik.enable', 'value': 'true' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.rule', 'value': 'Host(`{{ instance_name }}.{{ domain }}`)' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.priority', 'value': '100' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.entrypoints', 'value': 'web' }
+    - { 'key': 'traefik.http.services.{{ instance_name }}-api.loadbalancer.server.port', 'value': '8080' }
+
+- name: Run Recordings API container
+  become: yes
+  community.general.docker_container:
+    name: "{{ instance_name }}-api"
+    image: "ghcr.io/brianclooney/recordingsapi:{{ app_version }}"
+    state: started
+    pull: yes
+    restart_policy: unless-stopped
+    expose:
+      - 8080
+    env:
+      ConnectionStrings__RecordingDatabase: "server={{ instance_name }}-db;port=3306;user={{ db_username }};password={{ db_username }};database={{ db_database }}"
+      FilePaths__TempPath: "/app/temp"
+      FilePaths__StaticFileRootPath: "/app/data"
+      FilePaths__StaticFileRequestPath: "/static"
+    networks:
+      - name: "{{ private_network }}"
+    volumes:
+      - "/srv/{{ instance_name }}/data/upload:/app/data"
+      - "/srv/{{ instance_name }}/tmp:/app/temp"
+    labels: 
+      "{{ traefik_api_labels }}"
+
+- name: Initialize Traefik UI labels
+  set_fact:
+    traefik_ui_labels: {}
+
+- name: Set Traefik labels
+  set_fact:
+    traefik_ui_labels: "{{ traefik_ui_labels | combine({ item.key : item.value }) }}"
+  loop:
+    - { 'key': 'traefik.enable', 'value': 'true' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-ui.rule', 'value': 'Host(`{{ domain }}`)' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-ui.priority', 'value': '100' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-ui.entrypoints', 'value': 'web' }
+    - { 'key': 'traefik.http.services.{{ instance_name }}-ui.loadbalancer.server.port', 'value': '8080' }
+
+- name: Run Recordings UI container
+  become: yes
+  community.general.docker_container:
+    name: "{{ instance_name }}-ui"
+    image: "ghcr.io/brianclooney/recordingsui:{{ app_version }}"
+    state: started
+    pull: yes
+    restart_policy: unless-stopped
+    expose:
+      - 8080
+    env:
+      ApiSettings__BaseAddress: "http://{{ instance_name }}-api:8080"
+    volumes:
+      "/srv/{{ instance_name }}/data/dataprotection:/root/.aspnet/DataProtection-Keys"
+    networks:
+      - name: "{{ private_network }}"
+    labels: 
+      "{{ traefik_ui_labels }}"

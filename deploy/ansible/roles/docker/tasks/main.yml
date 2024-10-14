@@ -1,0 +1,33 @@
+---
+
+- name: Update apt packages
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: Install docker engine
+  become: yes
+  apt:
+    name: docker.io
+    state: present
+
+- name: Install docker compose
+  become: yes
+  apt:
+    name: docker-compose
+    state: present
+
+- name: Start docker service
+  become: yes
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Create public network
+  become: yes
+  community.docker.docker_network:
+    name: public-network
+    state: present
+    driver: bridge
+    internal: false
