@@ -1,0 +1,32 @@
+---
+
+- name: Initialize Traefik labels
+  set_fact:
+    traefik_labels: {}
+
+- name: Set Traefik labels
+  set_fact:
+    traefik_labels: "{{ traefik_labels | combine({ item.key : item.value }) }}"
+  loop:
+    - { 'key': 'traefik.enable', 'value': 'true' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}.rule', 'value': 'Host(`{{ instance_name }}.{{ domain }}`)' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}.priority', 'value': '100' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}.entrypoints', 'value': 'web' }
+    - { 'key': 'traefik.http.services.{{ instance_name }}.loadbalancer.server.port', 'value': '8080' }
+
+- name: Run Adminer container
+  become: yes
+  docker_container:
+    name: "{{ instance_name }}"
+    image: adminer:4.8.1-standalone
+    state: started
+    pull: yes
+    restart_policy: unless-stopped
+    networks:
+      - name: "{{ private_network }}"
+    expose:
+      - "8080"
+    env:
+      ADMINER_DESIGN: flat
+    labels: 
+      "{{ traefik_labels }}"
