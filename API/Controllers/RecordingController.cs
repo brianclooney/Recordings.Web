@@ -42,9 +42,7 @@ namespace Recordings.API.Controllers
                 .OrderByDescending(d => d)
                 .ToListAsync();
 
-            return dates.Count == 0 ?
-                NotFound() :
-                Ok(dates.Select(d => d.ToString("yyyy-MM-dd")));
+            Ok(dates.Select(d => d.ToString("yyyy-MM-dd")));
         }
 
         [HttpGet("titles")]
