@@ -56,7 +56,7 @@ namespace Recordings.UI.Services
             {
                 var tracks = await _httpClient.GetFromJsonAsync<List<RecordingDto>>(uri) ?? new List<RecordingDto>();
                 // tracks.ForEach(t => t.Url = new Uri(_httpClient.BaseAddress!, t.Url).ToString());
-                tracks.ForEach(t => t.Url = new Uri(t.Url).ToString());
+                // tracks.ForEach(t => t.Url = new Uri(t.Url).ToString());
                 return tracks;
             }
             catch (Exception e)
