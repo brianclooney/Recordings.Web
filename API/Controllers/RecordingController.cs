@@ -85,11 +85,14 @@ namespace Recordings.API.Controllers
             var recordings = await query.OrderByDescending(r => r.RecordingDate).ThenBy(r => r.OrdinalNumber).ToListAsync();
 
             var staticRoot = $"{_filePathOptions.StaticFileRequestPath}";
-            // _logger.LogInformation($"staticRoot = {staticRoot}");
+            _logger.LogInformation($"staticRoot = {staticRoot}");
 
+	    var rr = recordings.Select(r => r.AsDto(staticRoot));
+            _logger.LogInformation($"rr = {rr}");
+	    
             return recordings.Count == 0 ?
                 NotFound() :
-                Ok(recordings.Select(r => r.AsDto(staticRoot)));
+                Ok(rr);
         }
 
         [HttpPost]
