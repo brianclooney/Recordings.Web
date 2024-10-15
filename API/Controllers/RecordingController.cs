@@ -87,8 +87,8 @@ namespace Recordings.API.Controllers
             var staticRoot = $"{_filePathOptions.StaticFileRequestPath}";
             _logger.LogInformation($"staticRoot = {staticRoot}");
 
-	    var rr = recordings.Select(r => r.AsDto(staticRoot));
-            _logger.LogInformation($"rr = {rr}");
+	    var rr = recordings.Select(r => r.AsDto(staticRoot));	    
+	    rr.ToList().ForEach(r => _logger.LogInformation($"r.Url = {r.Url}"));
 	    
             return recordings.Count == 0 ?
                 NotFound() :
