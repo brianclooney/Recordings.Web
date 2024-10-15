@@ -42,7 +42,7 @@
     traefik_api_labels: "{{ traefik_api_labels | combine({ item.key : item.value }) }}"
   loop:
     - { 'key': 'traefik.enable', 'value': 'true' }
-    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.rule', 'value': 'Host(`{{ domain }}`) && PathPrefix(`/api`)' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.rule', 'value': 'Host(`{{ domain }}`) &&  (PathPrefix(`/api`) || PathPrefix(`/static`))' }
     - { 'key': 'traefik.http.routers.{{ instance_name }}-api.priority', 'value': '1000' }
     - { 'key': 'traefik.http.routers.{{ instance_name }}-api.entrypoints', 'value': 'web' }
     - { 'key': 'traefik.http.services.{{ instance_name }}-api.loadbalancer.server.port', 'value': '8080' }
