@@ -1,14 +1,13 @@
 
 .env
+~tmp
 
-API/bin/
-API/obj/
-
-Shared/bin/
-Shared/obj/
-
-UI/bin/
-UI/obj/
+src/API/bin/
+src/API/obj/
+src/Shared/bin/
+src/Shared/obj/
+src/Client.Web/bin/
+src/Client.Web/obj/
 
 docs/build/
 

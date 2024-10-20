@@ -11,7 +11,7 @@ providers:
 
 # API and dashboard configuration
 api:
-  dashboard: true
+  dashboard: {{ true if deployment_environment == "dev" else false }}
   insecure: true
 
 log:

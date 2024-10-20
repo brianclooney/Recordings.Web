@@ -1,7 +1,7 @@
 
 using Recordings.Shared.DTOs;
 
-namespace Recordings.UI.Services
+namespace Recordings.Client.Web.Services
 {
     public class ApiService
     {

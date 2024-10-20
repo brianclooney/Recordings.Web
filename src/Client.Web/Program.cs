@@ -1,6 +1,6 @@
-using UI.Components;
-using Recordings.UI.Models;
-using Recordings.UI.Services;
+using Client.Web.Components;
+using Recordings.Client.Web.Models;
+using Recordings.Client.Web.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);

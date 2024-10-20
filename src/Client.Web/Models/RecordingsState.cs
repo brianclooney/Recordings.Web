@@ -1,7 +1,7 @@
 
 using Recordings.Shared.DTOs;
 
-namespace Recordings.UI.Models
+namespace Recordings.Client.Web.Models
 {
     public enum PlaybackState
     {

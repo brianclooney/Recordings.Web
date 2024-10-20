@@ -1,11 +1,11 @@
 @rendermode InteractiveServer
 
 @using Recordings.Shared.DTOs
-@using Recordings.UI.Models
+@using Recordings.Client.Web.Models
 
 @implements IDisposable
 
-@inject Recordings.UI.Services.ApiService ApiService
+@inject Recordings.Client.Web.Services.ApiService ApiService
 @inject RecordingsState RecordingsState
 @inject ILogger<Playlist> Logger
 

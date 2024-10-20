@@ -42,10 +42,18 @@
     traefik_api_labels: "{{ traefik_api_labels | combine({ item.key : item.value }) }}"
   loop:
     - { 'key': 'traefik.enable', 'value': 'true' }
-    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.rule', 'value': 'Host(`{{ domain }}`) &&  (PathPrefix(`/api`) || PathPrefix(`/static`))' }
+    # Router for API requests
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.service', 'value': '{{ instance_name }}-api' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-api.rule', 'value': 'Host(`{{ domain }}`) && PathPrefix(`/api/recording`)' }
     - { 'key': 'traefik.http.routers.{{ instance_name }}-api.priority', 'value': '1000' }
     - { 'key': 'traefik.http.routers.{{ instance_name }}-api.entrypoints', 'value': 'web' }
     - { 'key': 'traefik.http.services.{{ instance_name }}-api.loadbalancer.server.port', 'value': '8080' }
+    # Router for static files
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-static.service', 'value': '{{ instance_name }}-static' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-static.rule', 'value': 'Host(`{{ domain }}`) && PathPrefix(`/static`)' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-static.priority', 'value': '1000' }
+    - { 'key': 'traefik.http.routers.{{ instance_name }}-static.entrypoints', 'value': 'web' }
+    - { 'key': 'traefik.http.services.{{ instance_name }}-static.loadbalancer.server.port', 'value': '8080' }
 
 - name: Run Recordings API container
   become: yes

@@ -1,5 +1,5 @@
 
-namespace Recordings.UI.Models
+namespace Recordings.Client.Web.Models
 {
     public class TrackFilter
     {
